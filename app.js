@@ -4,12 +4,13 @@ const rateLimit = require('express-rate-limit');
 const morgan = require('morgan');
 const helmet = require('helmet');
 const bodyParser = require('body-parser');
-const mongoSanitize = require('express-mongo-sanitize');//req bodyn himayalash uchun
-var xss = require('xss-clean');//html ichidagai viruslarni ushlaydi
-var hpp = require('hpp');//urldagi xatolarni ushlaydi sort=duration&sort=name
+const mongoSanitize = require('express-mongo-sanitize'); //req bodyn himayalash uchun
+var xss = require('xss-clean'); //html ichidagai viruslarni ushlaydi
+var hpp = require('hpp'); //urldagi xatolarni ushlaydi sort=duration&sort=name
 
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
+const reviewRouter = require('./routes/reviewRoutes');
 const AppError = require('./utility/appError');
 const ErrorController = require('./controllers/errorController');
 
@@ -21,7 +22,7 @@ const limiter = rateLimit({
   // legacyHeaders: false, // Disable the `X-RateLimit-*` headers
 });
 const app = express();
-app.use(express.json({ limit: '1kb' }));
+app.use(express.json({ limit: '100kb' }));
 app.use(mongoSanitize());
 app.use(xss());
 app.use(hpp());
@@ -58,6 +59,7 @@ app.use((req, res, next) => {
 
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
+app.use('/api/v1/reviews', reviewRouter);
 
 app.all('*', function (req, res, next) {
   next(new AppError(`this url has not found: ${req.originalUrl}`, 404));

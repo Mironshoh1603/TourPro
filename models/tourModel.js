@@ -1,7 +1,30 @@
 const mongoose = require('mongoose');
+const User = require('./userModel');
 
 const tourSchema = new mongoose.Schema(
   {
+    startLocation: {
+      type: {
+        type: String,
+        default: 'Point',
+        enum: ['Point'],
+      },
+      coordinates: [Number],
+      address: String,
+      description: String,
+    },
+    locations: [
+      {
+        type: {
+          type: String,
+          default: 'Point',
+          enum: ['Point'],
+        },
+        coordinates: [Number],
+        day: Number,
+        description: String,
+      },
+    ],
     name: {
       type: String,
       required: [true, 'Name ni kirtishingiz shart'],
@@ -69,12 +92,18 @@ const tourSchema = new mongoose.Schema(
       type: Date,
       default: Date.now(),
     },
+    guides: [{ type: mongoose.Schema.ObjectId, ref: 'users' }],
   },
   {
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
   }
 );
+tourSchema.virtual('reviews', {
+  ref: 'reviews',
+  foreignField: 'tour',
+  localField: '_id',
+});
 
 tourSchema.virtual('haftaDavomEtish').get(function () {
   return this.duration / 7;
